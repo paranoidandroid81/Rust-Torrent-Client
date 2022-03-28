@@ -1,5 +1,4 @@
-mod torrent_file;
-use torrent_file::torrent_file::TorrentFile;
+use rust_torrent_client::torrent_file;
 
 fn main() {
     println!("Hello, world!");

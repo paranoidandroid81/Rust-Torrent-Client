@@ -1,43 +1,29 @@
-use crate::torrent_file::info_dict::{SingleFileInfo, MultiFileInfo};
 use crate::torrent_file::info_dict::
-    {InfoDict, IStoreFileInfo};
-
-
-pub enum TorrentFileLoadError
-{
-    InfoDictNotFound,
-    UnsupportedTypeFound
-}
-
-#[derive(Default, RustcEncodable, RustcDecodable)]
-pub struct TorrentFile<T: IStoreFileInfo>
-{
-    info: InfoDict<T>,
-    announce: String
-}
-
-impl TorrentFile<SingleFileInfo> 
-{
-    pub fn new_empty() -> TorrentFile<SingleFileInfo>
-    {
-        TorrentFile::<SingleFileInfo>{announce: "".to_string(), info: InfoDict::<SingleFileInfo>::new_empty()}
-    }
-    
-}
-
-
-impl TorrentFile<MultiFileInfo>
-{
-    pub fn new_empty() -> TorrentFile<MultiFileInfo>
-    {
-        TorrentFile::<MultiFileInfo>{announce: "".to_string(), info: InfoDict::<MultiFileInfo>::new_empty()}
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    
+    {Node, Info};
+use serde_bencode::de;
+use serde_derive::{Serialize, Deserialize};
+use serde_bytes::ByteBuf;
+use std::io::{self, Read};
+   
+#[derive(Debug, Deserialize)]
+pub struct Torrent {
+    info: Info,
+    announce: String,
+    #[serde(default)]
+    nodes: Option<Vec<Node>>,
+    #[serde(default)]
+    encoding: Option<String>,
+    #[serde(default)]
+    httpseeds: Option<Vec<String>>,
+    #[serde(default)]
+    #[serde(rename = "announce-list")]
+    announce_list: Option<Vec<Vec<String>>>,
+    #[serde(default)]
+    #[serde(rename = "creation date")]
+    creation_date: Option<i64>,
+    #[serde(rename = "comment")]
+    comment: Option<String>,
+    #[serde(default)]
+    #[serde(rename = "created by")]
+    created_by: Option<String>,
 }

@@ -1,97 +1,34 @@
-use rustc_serialize::Decoder;
-use bencode::{encode, Decoder as OtherDecoder};
-use std::collections::HashMap;
-use rustc_serialize::{Encodable, Decodable};
-use regex::Regex;
+use serde_derive::{Deserialize};
+use serde_bytes::ByteBuf;
 
+#[derive(Debug, Deserialize)]
+pub struct Node(String, i64);
 
-pub enum InfoDictLoadError
-{
-    FileInfoNotFound,
-    UnsupportedInfoDictTypeFound
+#[derive(Debug, Deserialize)]
+struct File {
+    path: Vec<String>,
+    length: i64,
+    #[serde(default)]
+    md5sum: Option<String>,
 }
 
-#[derive(Default, RustcEncodable, RustcDecodable, PartialEq, Debug)]
-pub struct InfoDict<T: IStoreFileInfo>
-{
-    piece_length: i32,
-    pieces: String,
-    file_info: T
-}
-
-#[derive(Default, RustcEncodable, RustcDecodable, PartialEq, Debug)]
-pub struct SingleFileInfo
-{
+#[derive(Debug, Deserialize)]
+pub struct Info {
     name: String,
-    length: i32
-}
-
-impl SingleFileInfo
-{
-    fn new_empty() -> SingleFileInfo
-    {
-        SingleFileInfo{name: "".to_string(), length: 0} 
-    }
-}
-
-#[derive(Default, RustcEncodable, RustcDecodable, PartialEq, Debug)]
-pub struct MultiFileInfo
-{
-    name: String,
-    files: Vec<FilesDict>
-}
-
-impl MultiFileInfo
-{
-    fn new_empty() -> MultiFileInfo
-    {
-        MultiFileInfo{name: "".to_string(), files: vec!()} 
-    }
-}
-
-impl InfoDict<SingleFileInfo>
-{
-    pub fn new_empty() -> InfoDict<SingleFileInfo>
-    {
-        InfoDict{piece_length: 0, pieces: "".to_string(), file_info: SingleFileInfo::new_empty()}
-    }
-}
-
-impl InfoDict<MultiFileInfo>
-{
-    pub fn new_empty() -> InfoDict<MultiFileInfo>
-    {
-        InfoDict{piece_length: 0, pieces: "".to_string(), file_info: MultiFileInfo::new_empty()}
-    }
-}
-
-#[derive(Default, RustcEncodable, RustcDecodable, PartialEq, Debug)]
-struct FilesDict
-{
-    length: i32,
-    path: Vec<String>
-}
-
-
-
-impl IStoreFileInfo for SingleFileInfo 
-{
-}
-
-impl IStoreFileInfo for MultiFileInfo
-{
-
-}
-
-pub trait IStoreFileInfo
-{
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::torrent_file::file_parser::TorrentFileParser;
-use super::*;
-
-    
-
+    pieces: ByteBuf,
+    #[serde(rename = "piece length")]
+    piece_length: i64,
+    #[serde(default)]
+    md5sum: Option<String>,
+    #[serde(default)]
+    length: Option<i64>,
+    #[serde(default)]
+    files: Option<Vec<File>>,
+    #[serde(default)]
+    private: Option<u8>,
+    #[serde(default)]
+    path: Option<Vec<String>>,
+    #[serde(default)]
+    #[serde(rename = "root hash")]
+    root_hash: Option<String>,
 }
